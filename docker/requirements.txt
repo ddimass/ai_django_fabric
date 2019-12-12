@@ -1,0 +1,16 @@
+Django>=2.0,<3.0
+djangorestframework
+djangorestframework_simplejwt
+django-cors-headers
+django-filter
+django-crontab
+Pillow
+h5py
+keras
+sklearn
+django-redis
+zeep
+requests
+numpy
+redis
+gunicorn

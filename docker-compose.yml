@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  web:
+    image: tf-django
+    working_dir: /django_api
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/django_api
+#    deploy:
+#      replicas: 2
+#      update_config:
+#        parallelism: 1
+#        delay: 10s
+#      restart_policy:
+#        condition: on-failure
+    networks:
+      - webnet
+    command: /bin/bash ./docker/init.sh
+networks:
+  webnet:
+

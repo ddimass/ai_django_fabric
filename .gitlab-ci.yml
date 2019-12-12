@@ -1,0 +1,59 @@
+stages:
+  - test
+  - build
+  - deploy
+
+test:
+  stage: test
+  script: echo "Running tests..."
+
+build:
+  stage: build
+  script: echo "Building the app..."
+
+
+# ------------------------------------------------------------------------------
+#                               DEPLOY TO PRODUCTION
+# ------------------------------------------------------------------------------
+# @see http://articles.slicehost.com/2007/10/10/rsync-exclude-files-and-folders
+deploy to production:
+  stage: deploy
+  variables:
+    DEPLOY_PATH: "/srv/nn_backend"
+  script:
+    - echo "Deploy to production server..."
+    - pwd
+    - if [ ! -d $DEPLOY_PATH ]; then mkdir $DEPLOY_PATH; fi
+    - rsync -arvz --include-from './rsync-include.txt' --exclude-from './rsync-exclude.txt' --delete ./ $DEPLOY_PATH
+    - cd $DEPLOY_PATH
+    - docker build --rm -t tf-django ./docker/
+    - docker-compose up -d
+  environment:
+    name: production
+  only:
+  - master
+
+
+# ------------------------------------------------------------------------------
+# # #                             DEPLOY TO STAGING
+# ------------------------------------------------------------------------------
+#deploy to staging:
+#  stage: deploy
+#  variables:
+#    DEPLOY_PATH: "/var/www/api2_stage"
+#  script:
+#    - echo "Deploy to staging server..."
+#    - pwd
+#    - if [ ! -d $DEPLOY_PATH ]; then mkdir $DEPLOY_PATH; fi
+#    - rsync -arvz --include-from './rsync-include.txt' --exclude-from './rsync-exclude.txt' --delete ./ $DEPLOY_PATH
+#    - cd $DEPLOY_PATH
+#    - php composer.phar self-update
+#    - php composer.phar install
+#    - cd ./docker
+#    - docker stack deploy --compose-file docker-compose.yml api2
+#    - pwd
+#  environment:
+#    name: staging
+#    url: https://api2.clawshorns.com
+#  only:
+#  - develop
